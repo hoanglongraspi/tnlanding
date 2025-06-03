@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Tú Nguyễn Film - Professional Videographer & Photographer</title>
+    <meta name="description" content="Chuyên quay phim, chụp ảnh sự kiện, cưới hỏi và quảng cáo với phong cách chuyên nghiệp, cảm xúc và sáng tạo" />
+    <meta name="author" content="Tú Nguyễn Film" />
+
+    <meta property="og:title" content="Tú Nguyễn Film - Professional Videographer & Photographer" />
+    <meta property="og:description" content="Chuyên quay phim, chụp ảnh sự kiện, cưới hỏi và quảng cáo với phong cách chuyên nghiệp, cảm xúc và sáng tạo" />
+    <meta property="og:type" content="website" />
+    
+
+    <meta name="twitter:card" content="summary_large_image" />
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="/src/main.tsx" as="script" />
+    
+    <!-- Performance optimizations -->
+    <link rel="dns-prefetch" href="https://cdn.gpteng.co" />
+    <link rel="preconnect" href="https://cdn.gpteng.co" crossorigin />
+    
+  </head>
+
+  <body>
+    <div id="root"></div>
+    
+    <!-- Main app script - highest priority -->
+    <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Lazy load CDN script after page load to prevent blocking -->
+    <script>
+      // Lazy load CDN script after initial content loads
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          const script = document.createElement('script');
+          script.src = 'https://cdn.gpteng.co/gptengineer.js';
+          script.type = 'module';
+          script.async = true;
+          script.defer = true;
+          document.head.appendChild(script);
+        }, 2000); // Load after 2 seconds to ensure main content is ready
+      });
+    </script>
+  </body>
+</html>
