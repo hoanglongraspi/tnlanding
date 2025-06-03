@@ -13,20 +13,18 @@ interface MediaSliderProps {
 const MediaSlider = ({ videoUrl, thumbnailUrl, images = [], title, className = "" }: MediaSliderProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Create media array: video first (if exists), then thumbnail, then additional images
+  // Create media array: video first (if exists), then additional images
+  // Do NOT include thumbnailUrl as it's just a representative image, not part of the gallery
   const mediaItems = [];
   
   if (videoUrl) {
     mediaItems.push({ type: 'video', url: videoUrl, title: `${title} - Video` });
   }
   
-  // Always include thumbnail as first image
-  mediaItems.push({ type: 'image', url: thumbnailUrl, title: `${title} - Main Image` });
-  
-  // Add additional images
+  // Add additional images (exclude thumbnail from slideshow)
   images.forEach((imageUrl, index) => {
     if (imageUrl.trim()) {
-      mediaItems.push({ type: 'image', url: imageUrl, title: `${title} - Image ${index + 2}` });
+      mediaItems.push({ type: 'image', url: imageUrl, title: `${title} - Image ${index + 1}` });
     }
   });
 
@@ -45,10 +43,24 @@ const MediaSlider = ({ videoUrl, thumbnailUrl, images = [], title, className = "
     setCurrentIndex(index);
   };
 
+  // If no media items (no video and no images), show the thumbnail as fallback
   if (totalItems === 0) {
     return (
-      <div className={`aspect-video bg-gray-800 rounded-2xl flex items-center justify-center ${className}`}>
-        <ImageIcon className="w-16 h-16 text-gray-500" />
+      <div className={`aspect-video bg-gray-800 rounded-2xl overflow-hidden relative ${className}`}>
+        <img
+          src={thumbnailUrl}
+          alt={title}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = '/project-thumbnail.webp';
+          }}
+        />
+        <div className="absolute top-4 left-4">
+          <div className="bg-black/60 backdrop-blur-sm rounded-lg px-3 py-1 flex items-center space-x-2">
+            <ImageIcon className="w-4 h-4 text-white" />
+            <span className="text-white text-sm font-medium">Thumbnail</span>
+          </div>
+        </div>
       </div>
     );
   }

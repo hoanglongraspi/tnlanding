@@ -7,6 +7,7 @@ import { companyService, companyGalleryService } from "@/lib/database-service";
 import { convertVideoUrl } from "@/lib/utils";
 import { Company, CompanyGallery } from "@/lib/supabase";
 import Slideshow from "@/components/ui/slideshow";
+import Modal from "@/components/ui/Modal";
 
 const CommercialWork = () => {
   const navigate = useNavigate();
@@ -77,210 +78,192 @@ const CommercialWork = () => {
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       {/* Full Screen Media Modal */}
-      {selectedMedia && (
-        <div className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4">
-          <div className="relative max-w-7xl max-h-full w-full h-full flex items-center justify-center">
-            {/* Close Button */}
-            <button
-              onClick={closeMediaModal}
-              className="absolute top-4 right-4 z-10 w-12 h-12 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20 hover:bg-black/70 transition-all duration-300 group"
-            >
-              <X className="w-6 h-6 text-white group-hover:scale-110 transition-transform duration-300" />
-            </button>
+      <Modal
+        isOpen={!!selectedMedia}
+        onClose={closeMediaModal}
+        className="flex items-center justify-center"
+      >
+        {selectedMedia && (
+          <div className="relative w-full h-full flex items-center justify-center">
+            {selectedMedia.type === 'video' ? (
+              <iframe
+                src={selectedMedia.src}
+                className="max-w-[90vw] max-h-[80vh] w-full aspect-video rounded-lg shadow-2xl"
+                allow="autoplay; encrypted-media"
+                allowFullScreen
+                style={{ border: 'none' }}
+              />
+            ) : selectedMedia.type === 'slideshow' ? (
+              <Slideshow 
+                images={selectedMedia.images || []} 
+                title={selectedMedia.title}
+                autoPlay={false}
+                showFrame={true}
+                showControls={true}
+                showIndicators={true}
+                className="max-w-[95vw] max-h-[90vh]"
+              />
+            ) : (
+              <img
+                src={selectedMedia.src}
+                alt={selectedMedia.title}
+                className="max-w-[90vw] max-h-[80vh] object-contain rounded-lg shadow-2xl"
+              />
+            )}
             
-            {/* Media Container */}
-            <div className="relative w-full h-full flex items-center justify-center p-8">
-              {selectedMedia.type === 'video' ? (
-                <iframe
-                  src={selectedMedia.src}
-                  className="max-w-full max-h-full w-full aspect-video rounded-lg shadow-2xl"
-                  allow="autoplay; encrypted-media"
-                  allowFullScreen
-                  style={{ border: 'none' }}
-                />
-              ) : selectedMedia.type === 'slideshow' ? (
-                <div className="max-w-5xl max-h-[80vh] w-full h-full flex items-center justify-center">
-                  <Slideshow 
-                    images={selectedMedia.images || []} 
-                    title={selectedMedia.title}
-                    autoPlay={false}
-                    showFrame={true}
-                    className="w-full h-full min-h-[500px]"
-                  />
-                </div>
-              ) : (
-                <img
-                  src={selectedMedia.src}
-                  alt={selectedMedia.title}
-                  className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
-                />
-              )}
-              
-              {/* Media Info */}
-              <div className="absolute bottom-4 left-4 bg-black/70 backdrop-blur-sm rounded-lg px-6 py-3 border border-orange-400/30">
-                <h3 className="text-white font-semibold text-lg">{selectedMedia.title}</h3>
-                <div className="flex items-center space-x-2 mt-1">
-                  {selectedMedia.type === 'video' ? 
-                    <Video className="w-4 h-4 text-orange-400" /> : 
-                    selectedMedia.type === 'slideshow' ? (
-                      <div className="flex items-center space-x-1">
-                        <Image className="w-4 h-4 text-orange-400" />
-                        <span className="text-orange-300 text-sm">Gallery ({selectedMedia.images?.length || 0})</span>
-                      </div>
-                    ) : (
+            {/* Media Info */}
+            <div className="absolute bottom-4 left-4 bg-black/70 backdrop-blur-sm rounded-lg px-6 py-3 border border-orange-400/30">
+              <h3 className="text-white font-semibold text-lg">{selectedMedia.title}</h3>
+              <div className="flex items-center space-x-2 mt-1">
+                {selectedMedia.type === 'video' ? 
+                  <Video className="w-4 h-4 text-orange-400" /> : 
+                  selectedMedia.type === 'slideshow' ? (
+                    <div className="flex items-center space-x-1">
                       <Image className="w-4 h-4 text-orange-400" />
-                    )
-                  }
-                  {selectedMedia.type !== 'slideshow' && (
-                    <span className="text-orange-300 text-sm capitalize">{selectedMedia.type}</span>
-                  )}
-                </div>
-              </div>
-            </div>
-            
-            {/* Click outside to close */}
-            <div 
-              className="absolute inset-0 -z-10" 
-              onClick={closeMediaModal}
-            ></div>
-          </div>
-        </div>
-      )}
-
-      {/* Company Gallery Modal */}
-      {selectedCompany && (
-        <div className="fixed inset-0 z-[90] bg-black/95 flex items-center justify-center p-4">
-          <div className="relative max-w-7xl max-h-full w-full h-full bg-gray-900 rounded-2xl overflow-hidden">
-            {/* Close Button */}
-            <button
-              onClick={closeCompanyModal}
-              className="absolute top-4 right-4 z-10 w-12 h-12 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20 hover:bg-black/70 transition-all duration-300 group"
-            >
-              <X className="w-6 h-6 text-white group-hover:scale-110 transition-transform duration-300" />
-            </button>
-
-            <div className="h-full overflow-y-auto">
-              {/* Company Header */}
-              <div className="p-8 border-b border-gray-800">
-                <div className="flex items-center space-x-6">
-                  {/* Company Logo/Icon */}
-                  <div 
-                    className="w-20 h-20 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg"
-                    style={{ backgroundColor: selectedCompany.folder_color }}
-                  >
-                    {selectedCompany.logo_url ? (
-                      <img 
-                        src={selectedCompany.logo_url} 
-                        alt={selectedCompany.name}
-                        className="w-16 h-16 rounded-full object-cover"
-                      />
-                    ) : (
-                      <Building2 className="w-10 h-10" />
-                    )}
-                  </div>
-                  
-                  {/* Company Info */}
-                  <div className="space-y-2">
-                    <h2 className="text-3xl font-bold text-white">{selectedCompany.name}</h2>
-                    <p className="text-gray-300 text-lg">{selectedCompany.description}</p>
-                    <div className="flex items-center space-x-4 text-sm">
-                      {selectedCompany.industry && (
-                        <div className="flex items-center space-x-2">
-                          <Building2 className="w-4 h-4 text-orange-400" />
-                          <span className="text-gray-400">{selectedCompany.industry}</span>
-                        </div>
-                      )}
+                      <span className="text-orange-300 text-sm">Gallery ({selectedMedia.images?.length || 0})</span>
                     </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Company Gallery */}
-              <div className="p-8">
-                <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold text-white mb-2">Gallery</h3>
-                  <p className="text-gray-400">Khám phá các dự án và nội dung đã thực hiện cho {selectedCompany.name}</p>
-                </div>
-
-                {galleryLoading ? (
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {[...Array(8)].map((_, i) => (
-                      <div key={i} className="aspect-square bg-gray-800 rounded-xl animate-pulse"></div>
-                    ))}
-                  </div>
-                ) : companyGallery.length === 0 ? (
-                  <div className="text-center py-16">
-                    <Folder className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                    <h4 className="text-xl font-semibold text-white mb-2">No content yet</h4>
-                    <p className="text-gray-400">This company folder is empty. Content will appear here once added through CMS.</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {companyGallery
-                      .sort((a, b) => {
-                        // First, sort by media type (videos first, then images)
-                        if (a.media_type === 'video' && b.media_type === 'image') return -1;
-                        if (a.media_type === 'image' && b.media_type === 'video') return 1;
-                        
-                        // If same media type, sort by sort_order, then by featured status
-                        if (a.sort_order !== b.sort_order) return a.sort_order - b.sort_order;
-                        if (a.featured !== b.featured) return b.featured ? 1 : -1;
-                        
-                        return 0;
-                      })
-                      .map((item: CompanyGallery) => (
-                        <div 
-                          key={item.id} 
-                          className="group relative cursor-pointer"
-                          onClick={() => openMediaModal(item)}
-                        >
-                          <div className="relative aspect-square overflow-hidden rounded-xl bg-gradient-to-br from-gray-800 to-gray-900 border border-white/10 group-hover:border-orange-400/40 transition-all duration-300">
-                            {/* Thumbnail */}
-                            <img
-                              src={item.thumbnail_url || item.media_url}
-                              alt={item.title}
-                              className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110"
-                            />
-                            
-                            {/* Overlay */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300">
-                              <div className="absolute bottom-0 left-0 right-0 p-3">
-                                <p className="text-white text-sm font-medium">{item.title}</p>
-                                <p className="text-gray-300 text-xs">{item.description}</p>
-                              </div>
-                            </div>
-                            
-                            {/* Media Type Icon */}
-                            <div className="absolute top-2 right-2 w-8 h-8 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center">
-                              {item.media_type === 'video' ? 
-                                <Play className="w-4 h-4 text-white" /> :
-                                item.media_type === 'image' && item.images && item.images.length > 1 ? (
-                                  <div className="flex items-center space-x-1">
-                                    <Eye className="w-3 h-3 text-white" />
-                                    <span className="text-white text-xs font-medium">{item.images.length}</span>
-                                  </div>
-                                ) : (
-                                  <Eye className="w-4 h-4 text-white" />
-                                )
-                              }
-                            </div>
-                            
-                            {/* Featured Badge */}
-                            {item.featured && (
-                              <div className="absolute top-2 left-2 w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center">
-                                <span className="text-white text-xs">★</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                  </div>
+                  ) : (
+                    <Image className="w-4 h-4 text-orange-400" />
+                  )
+                }
+                {selectedMedia.type !== 'slideshow' && (
+                  <span className="text-orange-300 text-sm capitalize">{selectedMedia.type}</span>
                 )}
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </Modal>
+
+      {/* Company Gallery Modal */}
+      <Modal
+        isOpen={!!selectedCompany}
+        onClose={closeCompanyModal}
+        zIndex="z-[90]"
+        className="bg-gray-900 rounded-2xl overflow-hidden"
+      >
+        {selectedCompany && (
+          <div className="h-full overflow-y-auto">
+            {/* Company Header */}
+            <div className="p-8 border-b border-gray-800">
+              <div className="flex items-center space-x-6">
+                {/* Company Logo/Icon */}
+                <div 
+                  className="w-20 h-20 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg"
+                  style={{ backgroundColor: selectedCompany.folder_color }}
+                >
+                  {selectedCompany.logo_url ? (
+                    <img 
+                      src={selectedCompany.logo_url} 
+                      alt={selectedCompany.name}
+                      className="w-16 h-16 rounded-full object-cover"
+                    />
+                  ) : (
+                    <Building2 className="w-10 h-10" />
+                  )}
+                </div>
+                
+                {/* Company Info */}
+                <div className="space-y-2">
+                  <h2 className="text-3xl font-bold text-white">{selectedCompany.name}</h2>
+                  <p className="text-gray-300 text-lg">{selectedCompany.description}</p>
+                  <div className="flex items-center space-x-4 text-sm">
+                    {selectedCompany.industry && (
+                      <div className="flex items-center space-x-2">
+                        <Building2 className="w-4 h-4 text-orange-400" />
+                        <span className="text-gray-400">{selectedCompany.industry}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Company Gallery */}
+            <div className="p-8">
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-bold text-white mb-2">Gallery</h3>
+                <p className="text-gray-400">Khám phá các dự án và nội dung đã thực hiện cho {selectedCompany.name}</p>
+              </div>
+
+              {galleryLoading ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  {[...Array(8)].map((_, i) => (
+                    <div key={i} className="aspect-square bg-gray-800 rounded-xl animate-pulse"></div>
+                  ))}
+                </div>
+              ) : companyGallery.length === 0 ? (
+                <div className="text-center py-16">
+                  <Folder className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                  <h4 className="text-xl font-semibold text-white mb-2">No content yet</h4>
+                  <p className="text-gray-400">This company folder is empty. Content will appear here once added through CMS.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  {companyGallery
+                    .sort((a, b) => {
+                      // First, sort by media type (videos first, then images)
+                      if (a.media_type === 'video' && b.media_type === 'image') return -1;
+                      if (a.media_type === 'image' && b.media_type === 'video') return 1;
+                      
+                      // If same media type, sort by sort_order, then by featured status
+                      if (a.sort_order !== b.sort_order) return a.sort_order - b.sort_order;
+                      if (a.featured !== b.featured) return b.featured ? 1 : -1;
+                      
+                      return 0;
+                    })
+                    .map((item: CompanyGallery) => (
+                      <div 
+                        key={item.id} 
+                        className="group relative cursor-pointer"
+                        onClick={() => openMediaModal(item)}
+                      >
+                        <div className="relative aspect-square overflow-hidden rounded-xl bg-gradient-to-br from-gray-800 to-gray-900 border border-white/10 group-hover:border-orange-400/40 transition-all duration-300">
+                          {/* Thumbnail */}
+                          <img
+                            src={item.thumbnail_url || item.media_url}
+                            alt={item.title}
+                            className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110"
+                          />
+                          
+                          {/* Overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300">
+                            <div className="absolute bottom-0 left-0 right-0 p-3">
+                              <p className="text-white text-sm font-medium">{item.title}</p>
+                              <p className="text-gray-300 text-xs">{item.description}</p>
+                            </div>
+                          </div>
+                          
+                          {/* Media Type Icon */}
+                          <div className="absolute top-2 right-2 w-8 h-8 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center">
+                            {item.media_type === 'video' ? 
+                              <Play className="w-4 h-4 text-white" /> :
+                              item.media_type === 'image' && item.images && item.images.length > 1 ? (
+                                <div className="flex items-center space-x-1">
+                                  <Eye className="w-3 h-3 text-white" />
+                                  <span className="text-white text-xs font-medium">{item.images.length}</span>
+                                </div>
+                              ) : (
+                                <Eye className="w-4 h-4 text-white" />
+                              )
+                            }
+                          </div>
+                          
+                          {/* Featured Badge */}
+                          {item.featured && (
+                            <div className="absolute top-2 left-2 w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center">
+                              <span className="text-white text-xs">★</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </Modal>
 
       {/* Header */}
       <div className="sticky top-0 bg-gray-900/95 backdrop-blur-lg border-b border-gray-800 z-50">
@@ -318,10 +301,10 @@ const CommercialWork = () => {
               <Film className="w-16 h-16 text-white" />
             </div>
             <h2 className="text-4xl font-bold text-white mb-4 drop-shadow-lg">Commercial Work</h2>
-            <p className="text-xl text-gray-200 max-w-3xl mx-auto leading-relaxed drop-shadow-md">
+            {/* <p className="text-xl text-gray-200 max-w-3xl mx-auto leading-relaxed drop-shadow-md">
               Khám phá các dự án thương mại được tổ chức theo từng đối tác. 
               Mỗi folder chứa bộ sưu tập ảnh và video được thực hiện cho công ty đó.
-            </p>
+            </p> */}
           </div>
 
           {/* Company Folders Section */}
@@ -463,13 +446,8 @@ const CommercialWork = () => {
                             {company.name}
                           </h4>
                           
-                          {/* Call to Action */}
-                          <div className="pt-4">
-                            <div className="inline-flex items-center space-x-3 bg-gradient-to-r from-orange-500/20 via-orange-500/30 to-orange-500/20 px-6 py-3 rounded-full border border-orange-400/30 group-hover:border-orange-400/50 transition-all duration-300 group-hover:shadow-lg">
-                              <span className="text-orange-300 font-semibold">Khám phá gallery</span>
-                              <ChevronRight className="w-5 h-5 text-orange-400 transition-transform duration-300 group-hover:translate-x-1" />
-                            </div>
-                          </div>
+                          
+                          
                         </div>
                       </div>
                     </div>
@@ -478,9 +456,6 @@ const CommercialWork = () => {
               </div>
             )}
           </div>
-
-          {/* CTA Section */}
-          
         </div>
       </div>
     </div>
