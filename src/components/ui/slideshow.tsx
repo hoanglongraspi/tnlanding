@@ -145,22 +145,24 @@ const Slideshow: React.FC<SlideshowProps> = ({
       {/* Enhanced Navigation Controls */}
       {showControls && images.length > 1 && (
         <>
+          {/* Previous Button - Enhanced Styling */}
           <Button
             onClick={goToPrevious}
             size="sm"
             variant="ghost"
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/70 hover:bg-black/90 text-white border border-white/20 opacity-0 group-hover:opacity-100 transition-all duration-500 backdrop-blur-md shadow-lg hover:scale-110 w-12 h-12 rounded-full"
+            className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/80 hover:bg-black/95 text-white border-2 border-white/30 hover:border-white/50 opacity-80 hover:opacity-100 transition-all duration-300 backdrop-blur-md shadow-2xl hover:scale-110 w-14 h-14 rounded-full group-hover:left-4 z-10"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="w-6 h-6" />
           </Button>
           
+          {/* Next Button - Enhanced Styling */}
           <Button
             onClick={goToNext}
             size="sm"
             variant="ghost"
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/70 hover:bg-black/90 text-white border border-white/20 opacity-0 group-hover:opacity-100 transition-all duration-500 backdrop-blur-md shadow-lg hover:scale-110 w-12 h-12 rounded-full"
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/80 hover:bg-black/95 text-white border-2 border-white/30 hover:border-white/50 opacity-80 hover:opacity-100 transition-all duration-300 backdrop-blur-md shadow-2xl hover:scale-110 w-14 h-14 rounded-full group-hover:right-4 z-10"
           >
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight className="w-6 h-6" />
           </Button>
 
           {/* Enhanced Play/Pause Button */}
@@ -210,6 +212,24 @@ const Slideshow: React.FC<SlideshowProps> = ({
           {title}
         </div>
       )}
+
+      {/* Keyboard Navigation Hint */}
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-0 group-hover:opacity-30 transition-opacity duration-500">
+        <div className="flex items-center space-x-8 text-white/50 text-xs">
+          <div className="flex items-center space-x-1">
+            <div className="w-6 h-6 bg-white/10 rounded border border-white/20 flex items-center justify-center">
+              <ChevronLeft className="w-3 h-3" />
+            </div>
+            <span>Previous</span>
+          </div>
+          <div className="flex items-center space-x-1">
+            <span>Next</span>
+            <div className="w-6 h-6 bg-white/10 rounded border border-white/20 flex items-center justify-center">
+              <ChevronRight className="w-3 h-3" />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

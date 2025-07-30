@@ -66,7 +66,7 @@ const MediaSlider = ({ videoUrl, thumbnailUrl, images = [], title, className = "
   }
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative group ${className}`}>
       {/* Main Media Display */}
       <div className="aspect-video bg-gray-800 rounded-2xl overflow-hidden relative">
         {currentItem.type === 'video' ? (
@@ -89,19 +89,22 @@ const MediaSlider = ({ videoUrl, thumbnailUrl, images = [], title, className = "
           />
         )}
 
-        {/* Navigation Arrows - Only show if more than 1 item */}
+        {/* Enhanced Navigation Arrows - Only show if more than 1 item */}
         {totalItems > 1 && (
           <>
+            {/* Previous Button - Enhanced Styling */}
             <Button
               onClick={goToPrevious}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white rounded-full w-10 h-10 p-0 backdrop-blur-sm"
+              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/80 hover:bg-black/95 text-white border-2 border-white/30 hover:border-white/50 opacity-70 hover:opacity-100 transition-all duration-300 backdrop-blur-md shadow-2xl hover:scale-110 w-12 h-12 rounded-full group-hover:left-4 z-10"
               size="sm"
             >
               <ChevronLeft className="w-5 h-5" />
             </Button>
+
+            {/* Next Button - Enhanced Styling */}
             <Button
               onClick={goToNext}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white rounded-full w-10 h-10 p-0 backdrop-blur-sm"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/80 hover:bg-black/95 text-white border-2 border-white/30 hover:border-white/50 opacity-70 hover:opacity-100 transition-all duration-300 backdrop-blur-md shadow-2xl hover:scale-110 w-12 h-12 rounded-full group-hover:right-4 z-10"
               size="sm"
             >
               <ChevronRight className="w-5 h-5" />
@@ -136,22 +139,47 @@ const MediaSlider = ({ videoUrl, thumbnailUrl, images = [], title, className = "
             </div>
           </div>
         )}
+
+        {/* Keyboard Navigation Hint - Show on hover */}
+        {totalItems > 1 && (
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-0 group-hover:opacity-20 transition-opacity duration-500">
+            <div className="flex items-center space-x-6 text-white/70 text-xs">
+              <div className="flex items-center space-x-1">
+                <div className="w-5 h-5 bg-white/10 rounded border border-white/20 flex items-center justify-center">
+                  <ChevronLeft className="w-2.5 h-2.5" />
+                </div>
+                <span>Prev</span>
+              </div>
+              <div className="flex items-center space-x-1">
+                <span>Next</span>
+                <div className="w-5 h-5 bg-white/10 rounded border border-white/20 flex items-center justify-center">
+                  <ChevronRight className="w-2.5 h-2.5" />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Dots Navigation - Only show if more than 1 item */}
+      {/* Enhanced Dots Navigation - Only show if more than 1 item */}
       {totalItems > 1 && (
         <div className="flex justify-center space-x-2 mt-4">
           {mediaItems.map((item, index) => (
             <button
               key={index}
               onClick={() => goToSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-200 ${
+              className={`relative transition-all duration-300 hover:scale-125 ${
                 index === currentIndex
-                  ? 'bg-blue-500 scale-110'
-                  : 'bg-gray-500 hover:bg-gray-400'
+                  ? 'w-6 h-3 bg-blue-500 rounded-full shadow-lg'
+                  : 'w-3 h-3 bg-gray-500 hover:bg-gray-400 rounded-full shadow-md'
               }`}
               aria-label={`Go to ${item.type} ${index + 1}`}
-            />
+            >
+              {/* Active indicator glow */}
+              {index === currentIndex && (
+                <div className="absolute -inset-1 bg-blue-500/30 rounded-full blur-sm"></div>
+              )}
+            </button>
           ))}
         </div>
       )}
