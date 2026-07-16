@@ -442,7 +442,7 @@ const Index = () => {
                     }}
                     ref={videoRef}
                   >
-                    <source src="https://a476760e5e0e2fbe41abc3ce966d5a6a.r2.cloudflarestorage.com/hii/TVC%20Tu%20Nguyen%20Film%20.mp4" type="video/mp4" />
+                    <source src="https://pub-e3dbd06ac25e49f38618acbb666f45b1.r2.dev/TVC%20Tu%20Nguyen%20Film%20.mp4" type="video/mp4" />
                     <source src="/TVCTuNguyenFilm.webm" type="video/webm" />
                     Your browser does not support the video tag.
                   </video>
