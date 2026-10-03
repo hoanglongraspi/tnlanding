@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Search, Phone, MessageCircle, Facebook, Plus, Package } from "lucide-react";
+import { ArrowLeft, Search, X, Phone, MessageCircle, Facebook, Plus, Package } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { rentalService } from "@/lib/database-service";
 import { Rental } from "@/lib/supabase";
@@ -12,6 +12,10 @@ const PHONE = "0387990332";
 const ZALO_URL = `https://zalo.me/${PHONE}`;
 const FACEBOOK_URL = "https://www.facebook.com/share/1DiibpAwPB/?mibextid=wwXIfr";
 const ALL = "Tất cả";
+
+// Lowercase and strip Vietnamese accents so "den" matches "Đèn"
+const normalize = (text: string) =>
+  text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d");
 
 const formatPrice = (price: number) => `${new Intl.NumberFormat("vi-VN").format(price)}đ`;
 
@@ -39,11 +43,16 @@ const RentalHouse = () => {
     }));
   }, [rentals]);
 
-  const query = search.trim().toLowerCase();
+  const terms = normalize(search).split(/\s+/).filter(Boolean);
+  const matches = (item: Rental, category: string) => {
+    const haystack = normalize(`${item.name} ${category} ${item.description || ""}`);
+    return terms.every((term) => haystack.includes(term));
+  };
   const visibleGroups = groups
     .filter((g) => activeCategory === ALL || g.category === activeCategory)
-    .map((g) => ({ ...g, items: g.items.filter((item) => !query || item.name.toLowerCase().includes(query)) }))
+    .map((g) => ({ ...g, items: g.items.filter((item) => matches(item, g.category)) }))
     .filter((g) => g.items.length > 0);
+  const resultCount = visibleGroups.reduce((n, g) => n + g.items.length, 0);
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
@@ -60,9 +69,21 @@ const RentalHouse = () => {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              type="search"
               placeholder="Tìm thiết bị..."
-              className="w-full rounded-full bg-gray-800 border border-gray-700 pl-9 pr-4 py-2 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
+              aria-label="Tìm thiết bị"
+              className="w-full rounded-full bg-gray-800 border border-gray-700 pl-9 pr-9 py-2 [&::-webkit-search-cancel-button]:hidden text-sm text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
             />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch("")}
+                aria-label="Xoá tìm kiếm"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full text-gray-400 hover:text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </label>
         </div>
       </header>
@@ -87,6 +108,12 @@ const RentalHouse = () => {
           </div>
         )}
 
+        {terms.length > 0 && !isLoading && (
+          <p className="text-sm text-gray-500 mb-6 text-center">
+            {resultCount} kết quả cho “{search.trim()}”
+          </p>
+        )}
+
         {isLoading && (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-6">
             {[...Array(10)].map((_, i) => (
@@ -106,7 +133,14 @@ const RentalHouse = () => {
             <Package className="w-12 h-12 mx-auto mb-4 text-gray-300" />
             {rentals.length === 0
               ? <p>Chưa có thiết bị cho thuê. Liên hệ {PHONE} để được tư vấn.</p>
-              : <p>Không tìm thấy thiết bị phù hợp.</p>}
+              : (
+                <>
+                  <p>Không tìm thấy thiết bị phù hợp.</p>
+                  <button onClick={() => { setSearch(""); setActiveCategory(ALL); }} className="mt-3 text-sm font-semibold text-amber-700 hover:underline">
+                    Xem tất cả thiết bị
+                  </button>
+                </>
+              )}
           </div>
         )}
 
