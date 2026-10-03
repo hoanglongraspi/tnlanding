@@ -18,11 +18,13 @@ import {
   ExternalLink,
   CheckCircle,
   Building2,
-  HardDrive
+  HardDrive,
+  Package
 } from "lucide-react";
 import PortfolioManager from "@/components/admin/PortfolioManager";
 import CompaniesManager from "@/components/admin/CompaniesManager";
 import MediaManager from "@/components/admin/MediaManager";
+import RentalManager from "@/components/admin/RentalManager";
 import { analyticsService, checkDatabaseSetup } from "@/lib/database-service";
 import { isSupabaseConfigured, getConfigurationStatus } from "@/lib/supabase";
 import { verifyAuthToken, clearAuth } from "@/lib/auth-service";
@@ -283,6 +285,9 @@ const AdminDashboard = () => {
       case "events":
         return <PortfolioManager category="events" />;
 
+      case "rental":
+        return <RentalManager />;
+
       case "media":
         return <MediaManager />;
 
@@ -341,6 +346,7 @@ const AdminDashboard = () => {
             { id: "personal", label: "Personal", icon: Camera },
             { id: "commercial", label: "Commercial", icon: Film },
             { id: "events", label: "Events", icon: Calendar },
+            { id: "rental", label: "Rental", icon: Package },
            
           ].map((tab) => (
             <button

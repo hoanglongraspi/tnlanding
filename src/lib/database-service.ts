@@ -1,4 +1,4 @@
-import { supabase, Portfolio, Media, PageContent, Company, CompanyGallery, isSupabaseConfigured } from './supabase'
+import { supabase, Portfolio, Media, PageContent, Company, CompanyGallery, Rental, isSupabaseConfigured } from './supabase'
 
 // Helper function to check configuration
 const checkConfiguration = () => {
@@ -653,6 +653,7 @@ export const companyGalleryService = {
         .eq('status', 'published')
         .eq('featured', true)
         .order('created_at', { ascending: false })
+        .limit(1)
         .maybeSingle()
 
       if (featuredError) {
@@ -669,6 +670,7 @@ export const companyGalleryService = {
         .select('*')
         .eq('status', 'published')
         .order('created_at', { ascending: false })
+        .limit(1)
         .maybeSingle()
 
       if (recentError) {
@@ -683,3 +685,62 @@ export const companyGalleryService = {
     }
   }
 } 
+// Rental House operations
+export const rentalService = {
+  async getAll(status?: 'published' | 'draft') {
+    checkConfiguration()
+
+    let query = supabase
+      .from('rentals')
+      .select('*')
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: false })
+
+    if (status) {
+      query = query.eq('status', status)
+    }
+
+    const { data, error } = await query
+    if (error) throw error
+    return data as Rental[]
+  },
+
+  async create(rental: Omit<Rental, 'id' | 'created_at' | 'updated_at'>) {
+    checkConfiguration()
+
+    const { data, error } = await supabase
+      .from('rentals')
+      .insert([rental])
+      .select()
+      .single()
+
+    if (error) throw error
+    return data as Rental
+  },
+
+  async update(id: string, updates: Partial<Rental>) {
+    checkConfiguration()
+
+    const { data, error } = await supabase
+      .from('rentals')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (error) throw error
+    return data as Rental
+  },
+
+  async delete(id: string) {
+    checkConfiguration()
+
+    const { error } = await supabase
+      .from('rentals')
+      .delete()
+      .eq('id', id)
+
+    if (error) throw error
+    return { success: true }
+  }
+}

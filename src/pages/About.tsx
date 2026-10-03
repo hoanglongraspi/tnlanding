@@ -306,7 +306,7 @@ const About = () => {
             />
           </div>
           <p className="text-gray-400">
-            © 2024 Tú Nguyễn Film. All rights reserved.
+            © {new Date().getFullYear()} Tú Nguyễn Film. All rights reserved.
           </p>
         </div>
       </footer>

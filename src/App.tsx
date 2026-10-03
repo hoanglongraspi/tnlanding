@@ -12,6 +12,7 @@ const About = lazy(() => import("./pages/About"));
 const PersonalProject = lazy(() => import("./pages/PersonalProject"));
 const CommercialWork = lazy(() => import("./pages/CommercialWork"));
 const Events = lazy(() => import("./pages/Events"));
+const RentalHouse = lazy(() => import("./pages/RentalHouse"));
 const AdminLogin = lazy(() => import("./pages/AdminLogin"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const CMSDemo = lazy(() => import("./pages/CMSDemo"));
@@ -64,6 +65,7 @@ const App = () => (
             <Route path="/personal-project" element={<PersonalProject />} />
             <Route path="/commercial-work" element={<CommercialWork />} />
             <Route path="/events" element={<Events />} />
+            <Route path="/rental-house" element={<RentalHouse />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin" element={<AdminDashboard />} />

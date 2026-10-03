@@ -23,5 +23,9 @@ dist-ssr
 *.sln
 *.sw?
 *.mp4
+!public/hero-reel.mp4
 *.zip
 .cursor
+# env
+.env
+.env.local

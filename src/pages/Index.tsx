@@ -1,4 +1,4 @@
-import { Camera, Film, Video, Image, ChevronRight, Mail, Phone, Play, X, ArrowLeft, Globe, Maximize, Facebook } from "lucide-react";
+import { Camera, Film, Video, Image, ChevronRight, Mail, Phone, Play, X, ArrowLeft, Globe, Maximize, Facebook, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useState, useEffect, useRef } from "react";
@@ -147,6 +147,7 @@ const Index = () => {
       nav: {
         home: 'Trang chủ',
         about: 'Về chúng tôi', 
+        rental: 'Rental House',
         contact: 'Liên hệ'
       },
       hero: {
@@ -177,6 +178,11 @@ const Index = () => {
           button: 'Xem thêm'
         }
       },
+      rental: {
+        title: 'Rental House',
+        description: 'Cho thuê thiết bị quay chụp chuyên nghiệp, giá theo ngày.',
+        button: 'Xem thiết bị cho thuê'
+      },
       contact: {
         title: getCMSContent('contact-title', 'Liên hệ hợp tác'),
         subtitle: getCMSContent('contact-subtitle', 'Sẵn sàng biến ý tưởng của bạn thành hiện thực')
@@ -190,13 +196,14 @@ const Index = () => {
           'TuNguyen Film fanpage: https://www.facebook.com/share/1DiibpAwPB/?mibextid=wwXIfr',
           '0387990332'
         ],
-        copyright: '© 2024 Tú Nguyễn Film. All rights reserved.'
+        copyright: `© ${new Date().getFullYear()} Tú Nguyễn Film. All rights reserved.`
       }
     },
     en: {
       nav: {
         home: 'Home',
         about: 'About Us',
+        rental: 'Rental House',
         contact: 'Contact'
       },
       hero: {
@@ -227,6 +234,11 @@ const Index = () => {
           button: 'View More'
         }
       },
+      rental: {
+        title: 'Rental House',
+        description: 'Professional camera and filming gear for rent, priced per day.',
+        button: 'View rental gear'
+      },
       contact: {
         title: getCMSContent('contact-title', 'Contact & Collaboration'),
         subtitle: getCMSContent('contact-subtitle', 'Ready to turn your ideas into reality')
@@ -240,7 +252,7 @@ const Index = () => {
           'TuNguyen Film fanpage: https://www.facebook.com/share/1DiibpAwPB/?mibextid=wwXIfr',
           '0387990332'
         ],
-        copyright: '© 2024 Tu Nguyen Film. All rights reserved.'
+        copyright: `© ${new Date().getFullYear()} Tu Nguyen Film. All rights reserved.`
       }
     }
   };
@@ -269,6 +281,12 @@ const Index = () => {
                 className="text-gray-300 hover:text-white transition-colors font-medium"
               >
                 {t.nav.about}
+              </button>
+              <button 
+                onClick={() => navigate('/rental-house')}
+                className="text-gray-300 hover:text-white transition-colors font-medium"
+              >
+                {t.nav.rental}
               </button>
               <a href="#contact" className="text-gray-300 hover:text-white transition-colors font-medium">
                 {t.nav.contact}
@@ -412,9 +430,12 @@ const Index = () => {
                 id="video-container"
                 className="aspect-video bg-gradient-to-br from-gray-700/80 to-gray-900/80 backdrop-blur-sm rounded-[22px] flex items-center justify-center relative overflow-hidden border border-white/10"
               >
-                {/* Loading State */}
-                {!videoInView && (
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-purple-600/20 flex items-center justify-center">
+                {/* Loading State - stays until the video has frames to show */}
+                {!videoLoaded && (
+                  <div
+                    className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-purple-600/20 bg-cover bg-center flex items-center justify-center"
+                    style={{ backgroundImage: "url('/hero-reel-poster.webp')" }}
+                  >
                     <div className="text-center space-y-4 relative z-10">
                       <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/20 animate-pulse">
                         <Play className="w-6 h-6 text-white ml-1" />
@@ -432,20 +453,17 @@ const Index = () => {
                     muted 
                     loop 
                     playsInline
-                    poster="/project-thumbnail.png"
-                    preload="none"
+                    poster="/hero-reel-poster.webp"
+                    preload="auto"
+                    src="/hero-reel.mp4"
                     className={`absolute inset-0 w-full h-full object-cover rounded-[22px] transition-opacity duration-500 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
                     onLoadedData={handleVideoLoad}
                     onError={(e) => {
-                      // Hide video and show placeholder if video fails to load
+                      // Hide video; the poster placeholder stays visible
                       e.currentTarget.style.display = 'none';
                     }}
                     ref={videoRef}
-                  >
-                    <source src="https://pub-e3dbd06ac25e49f38618acbb666f45b1.r2.dev/TVC%20Tu%20Nguyen%20Film%20.mp4" type="video/mp4" />
-                    <source src="/TVCTuNguyenFilm.webm" type="video/webm" />
-                    Your browser does not support the video tag.
-                  </video>
+                  />
                 )}
                 
                 {/* Fullscreen button overlay - only show when video is loaded */}
@@ -708,6 +726,29 @@ const Index = () => {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Rental House */}
+      <section className="px-6 pt-16">
+        <div
+          className="max-w-5xl mx-auto group cursor-pointer rounded-3xl border border-yellow-500/30 bg-gradient-to-br from-yellow-500/10 to-amber-600/5 hover:border-yellow-500/60 transition-colors p-8 md:p-10 flex flex-col md:flex-row items-center gap-6 md:gap-10"
+          onClick={() => {
+            navigate('/rental-house');
+            window.scrollTo(0, 0);
+          }}
+        >
+          <div className="w-20 h-20 shrink-0 bg-gradient-to-br from-yellow-500 to-amber-600 rounded-2xl flex items-center justify-center shadow-lg">
+            <Package className="w-10 h-10 text-white" />
+          </div>
+          <div className="flex-1 text-center md:text-left">
+            <h3 className="text-3xl font-bold text-white mb-2">{t.rental.title}</h3>
+            <p className="text-gray-300">{t.rental.description}</p>
+          </div>
+          <Button className="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold shrink-0">
+            {t.rental.button}
+            <ChevronRight className="w-4 h-4 ml-1" />
+          </Button>
         </div>
       </section>
       <div className="py-16"></div>
